@@ -18,16 +18,16 @@ def split(source, size, n):
             break
         count += 1
         filename = os.path.join(dest_dir, ('File%04d' % count + ext))
-        fileobj = open(filename, 'wb')
-        fileobj.write(chunk_f)
-        fileobj.close()
+        final_file = open(filename, 'wb')
+        final_file.write(chunk_f)
+        final_file.close()
     chunk = size
     chunk_f = input_file.read(chunk)
     count += 1
     filename = os.path.join(dest_dir, ('File%04d' % count + ext))
-    fileobj = open(filename, 'wb')
-    fileobj.write(chunk_f)
-    fileobj.close()
+    final_file = open(filename, 'wb')
+    final_file.write(chunk_f)
+    final_file.close()
     input_file.close()
 
 
@@ -44,19 +44,19 @@ if __name__ == '__main__':
         file_size = os.stat(file).st_size
         split(file, file_size, n)
     elif command == "-recompose":
-            file_re = open(sys.argv[2], "wb")
-            i = 3
-            while sys.argv[i]:
-                rd = open(sys.argv[i], "rb")
-                size = os.stat(rd).st_size
+            output = open("File.pdf", 'wb')
+            i = 2
+            while i<len(sys.argv):
+                f = sys.argv[i]
+                size = os.stat(f).st_size
+                rd = open(f, 'rb')
                 while True:
                     bytes = rd.read(size)
                     if not bytes:
                         break
-                    file_re.write(bytes)
+                    output.write(bytes)
                 i += 1
                 rd.close()
-            file_re.close()
-            print(file_re)
+            output.close()
     else:
         print("Command unknown")
