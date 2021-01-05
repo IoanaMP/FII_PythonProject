@@ -44,7 +44,10 @@ if __name__ == '__main__':
         file_size = os.stat(file).st_size
         split(file, file_size, n)
     elif command == "-recompose":
-            output = open("File.pdf", 'wb')
+            f = ntpath.split(sys.argv[2])[1]
+            fname, ext = os.path.splitext(f)
+            out = "File_recomposed" + ext
+            output = open(out, 'wb')
             i = 2
             while i<len(sys.argv):
                 f = sys.argv[i]
