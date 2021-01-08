@@ -15,9 +15,6 @@ from pathlib import Path
 import random
 import ntpath
 
-def extended_Euclid():
-    pass
-
 
 def polynom(X,c):
     """
@@ -37,41 +34,67 @@ def split(file, size, n, m):
     fac polinomul cu valori random pentru coeficienti
     pun valoarea "secretului" in file.secret(le-am pus in fisiere txt) sa le pot da ca argumente pentru recompose
     """
-    global max;
+    global max
     max = 1000000
     if m > n:
         raise ValueError("The threshold can not be greater than the number of shares")
     coef = coefficient(m, size)
     splited_data = []
-    dest_dir = Path().absolute()
-    f = ntpath.split(file)[1]
-    fname, ext = os.path.splitext(f)
     count = 0
     for i in range(n):
         rand = random.randrange(1,max)
         data = polynom(rand, coef)
         splited_data.append([rand, data])
         count += 1
-        filename = os.path.join(dest_dir, (fname + '%02d' % count + '.txt'))
+        filename = os.path.join(dest_dir, ('File%02d' % count + '.txt'))
         final_file = open(filename, 'w')
         final_file.write(str(splited_data))
 
-def recompose():
-    pass
+def recompose(files):
+    """
+    Aplic interpolarea Lagrange pe datele pentru a obtine din nou fisierul initial
+    """
+    sum = 0
+    s = len(files)
+    for i in range(s):
+        x1, y1 = files[i][0], files[i][1]
+        produs = 1
+        for j in range(s):
+            x2 = files[j][0]
+            if i!=j:
+                produs *= x2/(x2-x1)
+        produs *= y1
+        sum += produs
+    return int(round(sum,0))
 
 
 if __name__ == '__main__':
 
     print("Enter the split command(file.py -split no_shares threshold File_tobe_split.ext)")
     command = input().split()
-    action = command[1]
-    if action != "-split" or len(command) != 5:
+    if command[1] != "-split" or len(command) != 5:
         print("Incorrect command")
         exit()
     n = int(command[2])
     m = int(command[3])
     file = command[4]
+    f = ntpath.split(file)[1]
+    fname, ext = os.path.splitext(f)
     size = os.stat(file).st_size
     split(file, size, n, m)
+    global dest_dir
+    dest_dir = Path().absolute()
     print("Enter the recompose command(file.py -recompose file.ext file.ext etc)")
     command = input().split()
+    if command[1] != "-recompose":
+        print("Incorrect command")
+        exit()
+    i = 2
+    files = []
+    while i < len(command):
+        files.append(command[i])
+        i += 1
+    rsize = recompose(files)
+    filename = os.path.join(dest_dir, (fname+'_r'+ext))
+    final_file = open(filename, 'w')
+    final_file.write(str(rsize))
