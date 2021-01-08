@@ -13,6 +13,8 @@
  -recompose:
     To do: avem nevoie de cel putin m parti, folosim polinomul de interpolare Lagrange sa contruim polinomul
     din cele m parti date(pentru a avea din nou dimensiunea initiala in P(0)..)
+    Daca tot s-au permis sursele externe pentru criptare, am folosit urmatorul link(dar tot eu l-am facut sa si mearga)
+    https://eli.thegreenplace.net/2010/06/25/aes-encryption-of-files-in-python-with-pycrypto
 """
 
 import string
@@ -26,6 +28,53 @@ from decimal import *
 import random
 import ntpath
 import csv
+
+def encrypt_file(key, in_filename, chunksize, out_filename=None):
+    f = ntpath.split(in_filename)[1]
+    fname, ext = os.path.splitext(f)
+    if not out_filename:
+        out_filename = 'Encrypted_file' + ext
+
+    iv = Random.new().read(AES.block_size)
+    encryptor = AES.new(key, AES.MODE_CBC, iv)
+    filesize = os.path.getsize(in_filename)
+
+    with open(in_filename, 'rb') as infile:
+        with open(out_filename, 'wb') as outfile:
+            outfile.write(struct.pack('<Q', filesize))
+            outfile.write(iv)
+
+            while True:
+                chunk = infile.read(chunksize)
+                if len(chunk) == 0:
+                    break
+                elif len(chunk) % 16 != 0:
+                    blocks = (16 - len(chunk) % 16) % 16
+                    chunk += chr(0).encode("utf8") * blocks
+
+                outfile.write(encryptor.encrypt(chunk))
+    return out_filename
+
+def decrypt_file(key, in_filename, chunksize, out_filename=None):
+    f = ntpath.split(in_filename)[1]
+    fname, ext = os.path.splitext(f)
+    if not out_filename:
+        out_filename = 'TheSecret' + ext
+    with open(in_filename, 'rb') as infile:
+        origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
+        iv = infile.read(16)
+        decryptor = AES.new(key, AES.MODE_CBC, iv)
+
+        with open(out_filename, 'wb') as outfile:
+            while True:
+                chunk = infile.read(chunksize)
+                if len(chunk) == 0:
+                    break
+                elif len(chunk) % 16 != 0:
+                    blocks = (16 - len(chunk) % 16) % 16
+                    chunk += chr(0).encode("utf8") * blocks
+                outfile.write(decryptor.decrypt(chunk))
+            outfile.truncate(origsize)
 
 def polynom(X,c):
     """
@@ -99,6 +148,7 @@ if __name__ == '__main__':
     n = int(command[2])
     m = int(command[3])
     file = command[4]
+
     f = ntpath.split(file)[1]
     fname, ext = os.path.splitext(f)
     size = os.stat(file).st_size
@@ -107,6 +157,7 @@ if __name__ == '__main__':
     for i in range(15):
         key = key + str(randint(0, 9))
     print(key)
+    encripted_secret = encrypt_file(key, file, size, out_filename=None)
     split(int(key), n, m)
 
     print("Enter the recompose command(file.py -recompose file.ext file.ext etc)")
@@ -126,8 +177,8 @@ if __name__ == '__main__':
         files.append(nr)
         i += 1
     print(files)
-    rsize = recompose(files)
-    print('rsz', rsize)
-    # filename = os.path.join(dest_dir, (fname+'_r'+ext))
-    # final_file = open(filename, 'wb')
-    # final_file.write(rsize)
+    comp_key = recompose(files)
+    the_key = str(comp_key)
+    print('cheie recompusa', comp_key)
+    decrypt_file(the_key, file, size, out_filename=None)
+
