@@ -27,7 +27,12 @@ def polynom(X,c):
 
 
 def coefficient(m, secret_size):
-    pass
+    coeffici = []
+    for _ in range(m - 1):
+        coeffici = [random.randrange(0, secret_size)]
+    coeffici.append(secret_size)
+    # print("coef", coeffici)
+    return coeffici
 
 def split(file, size, n, m):
     """
@@ -39,14 +44,19 @@ def split(file, size, n, m):
     if m > n:
         raise ValueError("The threshold can not be greater than the number of shares")
     coef = coefficient(m, size)
-    splited_data = []
+
     count = 0
+    dest_dir = Path().absolute()
     for i in range(n):
+        splited_data = []
         rand = random.randrange(1,max)
         data = polynom(rand, coef)
-        splited_data.append([rand, data])
+        splited_data.append(rand)
+        splited_data.append(data)
         count += 1
         filename = os.path.join(dest_dir, ('File%02d' % count + '.txt'))
+        if filename in os.listdir(dest_dir):
+            os.remove(os.path.join(dest_dir, filename))
         final_file = open(filename, 'w')
         final_file.write(str(splited_data))
 
@@ -57,10 +67,10 @@ def recompose(files):
     sum = 0
     s = len(files)
     for i in range(s):
-        x1, y1 = files[i][0], files[i][1]
+        x1, y1 = int(files[i][0]), int(files[i][1])
         produs = 1
         for j in range(s):
-            x2 = files[j][0]
+            x2 = int(files[j][0])
             if i!=j:
                 produs *= x2/(x2-x1)
         produs *= y1
@@ -81,10 +91,11 @@ if __name__ == '__main__':
     f = ntpath.split(file)[1]
     fname, ext = os.path.splitext(f)
     size = os.stat(file).st_size
+    print('sz', size)
     split(file, size, n, m)
-    global dest_dir
-    dest_dir = Path().absolute()
+
     print("Enter the recompose command(file.py -recompose file.ext file.ext etc)")
+    dest_dir = Path().absolute()
     command = input().split()
     if command[1] != "-recompose":
         print("Incorrect command")
@@ -92,9 +103,16 @@ if __name__ == '__main__':
     i = 2
     files = []
     while i < len(command):
-        files.append(command[i])
+        fis = open(command[i], 'r')
+        dt = fis.read()
+        l = len(dt) - 1
+        dt = dt[1:l]
+        nr = dt.split(', ')
+        files.append(nr)
         i += 1
+    print(files)
     rsize = recompose(files)
+    print('rsz', rsize)
     filename = os.path.join(dest_dir, (fname+'_r'+ext))
-    final_file = open(filename, 'w')
-    final_file.write(str(rsize))
+    final_file = open(filename, 'wb')
+    final_file.write(rsize)
