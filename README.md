@@ -16,6 +16,8 @@ file3 -> part1 și part3
 ***Shamir's Secret Sharing: https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing#Problem
 
 Uswfull links:
-https://www.youtube.com/watch?v=iFY5SyY3IMQ
-https://arxiv.org/pdf/1502.07475.pdf
-https://cryptography.fandom.com/wiki/Shamir%27s_Secret_Sharing
+- https://www.youtube.com/watch?v=iFY5SyY3IMQ
+- https://arxiv.org/pdf/1502.07475.pdf
+- https://www.geeksforgeeks.org/shamirs-secret-sharing-algorithm-cryptography/
+- http://subdevise.com/2018/01/22/Implementing-Shamir-s-Secret-Sharing-in-Python/
+- https://ericrafaloff.com/shamirs-secret-sharing-scheme/
