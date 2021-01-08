@@ -17,14 +17,14 @@ def split(source, size, n):
         if not chunk_f:
             break
         count += 1
-        filename = os.path.join(dest_dir, ('File%04d' % count + ext))
+        filename = os.path.join(dest_dir, ('File%03d' % count + ext))
         final_file = open(filename, 'wb')
         final_file.write(chunk_f)
         final_file.close()
     chunk = size
     chunk_f = input_file.read(chunk)
     count += 1
-    filename = os.path.join(dest_dir, ('File%04d' % count + ext))
+    filename = os.path.join(dest_dir, ('File%03d' % count + ext))
     final_file = open(filename, 'wb')
     final_file.write(chunk_f)
     final_file.close()
