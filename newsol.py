@@ -180,5 +180,5 @@ if __name__ == '__main__':
     comp_key = recompose(files)
     the_key = str(comp_key)
     print('cheie recompusa', comp_key)
-    decrypt_file(the_key, file, size, out_filename=None)
+    decrypt_file(the_key, encripted_secret, size, out_filename=None)
 
